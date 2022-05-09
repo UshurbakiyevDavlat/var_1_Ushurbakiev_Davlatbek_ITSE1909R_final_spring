@@ -28,17 +28,17 @@ public class User {
     private Integer id;
 
     @Size(max = 250)
-    @Min(4)
+    @Size(min = 4)
     @Column(name = "login", nullable = false, length = 50)
     private String login;
 
     @Size(max = 250)
-    @Min(5)
+    @Size(min = 4)
     @Column(name = "password", nullable = false, length = 50)
     private String password;
 
     @CreatedDate
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     private Instant createdAt;
 
     @UpdateTimestamp
