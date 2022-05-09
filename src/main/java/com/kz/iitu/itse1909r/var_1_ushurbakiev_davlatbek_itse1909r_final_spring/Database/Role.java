@@ -48,6 +48,16 @@ public class Role {
         return id;
     }
 
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
+
     public void setId(Integer id) {
         this.id = id;
     }
