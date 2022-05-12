@@ -1,5 +1,7 @@
 package com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Database;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.Instant;
 
@@ -11,11 +13,13 @@ public class LabReport {
     @Column(name = "id", nullable = false)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ManyToOne()
     @JoinColumn(name = "health_id")
     private HealthHistory health;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ManyToOne
     @JoinColumn(name = "doctor_id")
     private User doctor;
 
@@ -106,6 +110,22 @@ public class LabReport {
 
     public HealthHistory getHealth() {
         return health;
+    }
+
+    @Override
+    public String toString() {
+        return "LabReport{" +
+                "id=" + id +
+                ", health=" + health +
+                ", doctor=" + doctor +
+                ", blood='" + blood + '\'' +
+                ", heart='" + heart + '\'' +
+                ", body='" + body + '\'' +
+                ", vision='" + vision + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", deletedAt=" + deletedAt +
+                '}';
     }
 
     public void setHealth(HealthHistory health) {

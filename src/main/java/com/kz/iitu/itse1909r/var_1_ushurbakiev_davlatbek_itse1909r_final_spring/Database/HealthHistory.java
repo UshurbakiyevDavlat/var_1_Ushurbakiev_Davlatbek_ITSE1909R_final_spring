@@ -14,6 +14,20 @@ public class HealthHistory {
     @Column(name = "title", length = 100)
     private String title;
 
+    @Override
+    public String toString() {
+        return "HealthHistory{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", user=" + user +
+                ", doctor=" + doctor +
+                ", status=" + status +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", deletedAt=" + deletedAt +
+                '}';
+    }
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
