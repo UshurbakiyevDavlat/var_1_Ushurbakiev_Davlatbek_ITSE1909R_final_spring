@@ -41,33 +41,38 @@ public class UserController {
 
     @GetMapping("/listen")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> listen() throws SQLException {
-        log.info(reciever.receiveMessage("text"));
-        return new ResponseEntity<String>(HttpStatus.OK);
+    public String listen() throws SQLException {
+        String answer = reciever.receiveMessage("text");
+        log.info(answer);
+        return  answer;
     }
 
     @PostMapping("/send")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<String> send() throws SQLException {
+    public String send(@RequestParam("msg") String msg) throws SQLException {
+        String ans = "";
         try {
-            action.SendMessage();
+            ans = action.SendMessage(msg);
         } catch (Exception exception) {
-            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+            return exception.getStackTrace().toString();
         }
-        return new ResponseEntity<String>(HttpStatus.OK);
+        return "Send - " + ans;
     }
 
     @GetMapping(value = "/testDelay")
     @ResponseStatus(HttpStatus.OK)
-    @Scheduled(initialDelay = 2000,fixedDelay = 200000)
-    public void testingDelay () {
-        log.info("Info about testing delay job.");
+    @Scheduled(initialDelay = 2000, fixedDelay = 200000)
+    public void sending() throws SQLException {
+        log.info("Sending message test");
+        this.send("is listening port scheduler");
     }
+
     @GetMapping(value = "/testRate")
     @ResponseStatus(HttpStatus.OK)
     @Scheduled(fixedRate = 20000)
-    public void testingRate () {
-        log.info("Info about testing rate job.");
+    public void listening() throws SQLException {
+        log.info("listening message");
+        this.listen();
     }
 
     @GetMapping(value = "/getAll")
@@ -107,26 +112,30 @@ public class UserController {
     public ResponseEntity create(@RequestBody User user) throws SQLException {
         List<User> listUsers = this.getAll();
         int lastId = listUsers.get(listUsers.size() - 1).getId();
-        if (userService.create(user, lastId) == Response.Status.BAD_REQUEST)  return (ResponseEntity) ResponseEntity.status(HttpStatus.BAD_REQUEST);
+        if (userService.create(user, lastId) == Response.Status.BAD_REQUEST)
+            return (ResponseEntity) ResponseEntity.status(HttpStatus.BAD_REQUEST);
         return ResponseEntity.ok("Created succesfully");
     }
 
     @PutMapping(value = "/updatePassword")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity update (
+    public ResponseEntity update(
             @RequestParam("login") String login,
             @RequestParam("password") String pass) throws SQLException {
         User user = this.getUserByLogin(login).get(0);
-        if (userService.update(user,pass) == Response.Status.NOT_MODIFIED) return (ResponseEntity) ResponseEntity.status(HttpStatus.NOT_MODIFIED);
+        if (userService.update(user, pass) == Response.Status.NOT_MODIFIED)
+            return (ResponseEntity) ResponseEntity.status(HttpStatus.NOT_MODIFIED);
         return ResponseEntity.ok("User changed login|password");
 
     }
+
     @DeleteMapping(value = "/delete")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity delete(@NotNull @RequestParam("id") Integer id) throws SQLException {
-        if (userService.delete(id) == Response.Status.NOT_MODIFIED) return (ResponseEntity) ResponseEntity.status(HttpStatus.NOT_MODIFIED);
+        if (userService.delete(id) == Response.Status.NOT_MODIFIED)
+            return (ResponseEntity) ResponseEntity.status(HttpStatus.NOT_MODIFIED);
         return ResponseEntity.ok("User deleted");
     }
 }

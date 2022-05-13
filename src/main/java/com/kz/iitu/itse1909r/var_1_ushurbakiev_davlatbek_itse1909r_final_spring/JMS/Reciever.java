@@ -11,7 +11,6 @@ public class Reciever {
 
     @JmsListener(destination = "Listener")
     public String receiveMessage(String text) {
-        System.out.println("Received <" + text + ">");
-        return text;
+        return "Recieved - " + text;
     }
 }

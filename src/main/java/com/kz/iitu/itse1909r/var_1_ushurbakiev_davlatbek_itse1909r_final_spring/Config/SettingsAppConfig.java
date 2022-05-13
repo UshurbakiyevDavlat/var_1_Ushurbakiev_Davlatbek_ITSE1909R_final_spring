@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 import org.springframework.jms.config.JmsListenerContainerFactory;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.io.IOException;
@@ -40,6 +42,7 @@ import java.util.Properties;
 @EnableJms
 @PropertySource("classpath:application.properties")
 public class SettingsAppConfig {
+
 
     @PostConstruct
     public void init() throws SQLException {
@@ -110,10 +113,13 @@ public class SettingsAppConfig {
         return factoryBean.getNativeEntityManagerFactory();
     }
 
+
+
     @Bean
     public JmsListenerContainerFactory<?> myFactory(
             ConnectionFactory connectionFactory,
-            DefaultJmsListenerContainerFactoryConfigurer configurer) {
+            DefaultJmsListenerContainerFactoryConfigurer configurer) throws JMSException {
+        connectionFactory.createConnection().start();
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         configurer.configure(factory, connectionFactory);
         return factory;
