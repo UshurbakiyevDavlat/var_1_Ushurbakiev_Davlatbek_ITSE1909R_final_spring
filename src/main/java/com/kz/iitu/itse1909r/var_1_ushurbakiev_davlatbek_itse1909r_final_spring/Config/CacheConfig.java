@@ -18,8 +18,11 @@ public class CacheConfig {
     public CacheManager cacheManager() {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCaches(Arrays.asList(
-                new ConcurrentMapCache("user"),
-                new ConcurrentMapCache("roles")));
+                new ConcurrentMapCache("users"),
+                new ConcurrentMapCache("roles"),
+                new ConcurrentMapCache("health"),
+                new ConcurrentMapCache("bills")
+        ));
         return cacheManager;
     }
 }

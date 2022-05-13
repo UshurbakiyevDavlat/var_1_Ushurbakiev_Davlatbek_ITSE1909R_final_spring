@@ -54,6 +54,17 @@ public class BillDetail {
         this.labCost = labCost;
     }
 
+    @Override
+    public String toString() {
+        return "BillDetail{" +
+                "id=" + id +
+                ", labCost=" + labCost +
+                ", doctorCost=" + doctorCost +
+                ", insurance=" + insurance +
+                ", additionalPay=" + additionalPay +
+                '}';
+    }
+
     public Integer getId() {
         return id;
     }

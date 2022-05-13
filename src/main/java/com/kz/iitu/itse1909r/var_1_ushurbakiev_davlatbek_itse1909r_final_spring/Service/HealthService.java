@@ -1,5 +1,6 @@
 package com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Service;
 
+import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Aop.Aspects;
 import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Aop.LogToken;
 import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Database.HealthHistory;
 import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Database.LabReport;
@@ -10,6 +11,7 @@ import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -34,11 +36,14 @@ public class HealthService {
     private final SessionFactory sessionFactory;
     private final LabReportsRepository labReportsRepository;
 
-    public HealthService(SessionFactory sessionFactory, HealthRepository healthRepository, UserRepository userRepository, LabReportsRepository labReportsRepository) {
+    private final CacheManager cacheManager;
+
+    public HealthService(SessionFactory sessionFactory, HealthRepository healthRepository, UserRepository userRepository, LabReportsRepository labReportsRepository, CacheManager cacheManager) {
         this.sessionFactory = sessionFactory;
         this.healthRepository = healthRepository;
         this.userRepository = userRepository;
         this.labReportsRepository = labReportsRepository;
+        this.cacheManager = cacheManager;
     }
 
     @LogToken
@@ -50,7 +55,12 @@ public class HealthService {
             noRollbackFor = {IllegalStateException.class}
     )
     public List<HealthHistory> getAllHistories() throws SQLException {
-        return this.healthRepository.getAll();
+        List<HealthHistory> list = this.healthRepository.getAll();
+        if (list.isEmpty()) {
+            log.info("history list is empty");
+            throw new SQLException();
+        }
+        return list;
     }
 
     @LogToken
@@ -62,7 +72,12 @@ public class HealthService {
             noRollbackFor = {IllegalStateException.class}
     )
     public List<LabReport> getAllLabs() throws SQLException{
-        return this.labReportsRepository.getAll();
+        List<LabReport> list = this.labReportsRepository.getAll();
+        if (list.isEmpty()) {
+            log.info("labs list is empty");
+            throw new SQLException();
+        }
+        return list;
     }
 
     @LogToken
@@ -74,7 +89,12 @@ public class HealthService {
             noRollbackFor = {IllegalStateException.class}
     )
     public List<HealthHistory> getConcrete(String title) throws SQLException {
-        return this.healthRepository.getByTitle(title);
+        List<HealthHistory> list = this.healthRepository.getByTitle(title);
+        if (list.isEmpty()) {
+            log.info("labs list is empty");
+            throw new SQLException();
+        }
+        return list;
     }
 
 
@@ -120,7 +140,11 @@ public class HealthService {
 
     @Transactional
     public LabReport labReports (int id) {
-        return labReportsRepository.getById(id);
+        LabReport labReport =  labReportsRepository.getById(id);
+        if (labReport == null) {
+            log.info("there is no labreports");
+        }
+        return labReport;
     }
     @Transactional
     @Modifying

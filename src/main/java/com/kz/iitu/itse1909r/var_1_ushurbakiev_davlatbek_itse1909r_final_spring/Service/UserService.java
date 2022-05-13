@@ -9,7 +9,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.Cache;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.Valid;
@@ -40,8 +43,11 @@ public class UserService {
     @PersistenceContext
     private EntityManager em;
 
-    public UserService(SessionFactory sessionFactory) {
+    private final CacheManager cacheManager;
+
+    public UserService(SessionFactory sessionFactory, CacheManager cacheManager) {
         this.sessionFactory = sessionFactory;
+        this.cacheManager = cacheManager;
     }
 
     @Autowired
@@ -60,7 +66,12 @@ public class UserService {
             noRollbackFor = {IllegalStateException.class}
     )
     public List<User> getUsers() throws SQLException {
-        return this.userRepository.getUsers();
+        List<User> list = this.userRepository.getUsers();
+        if (list.isEmpty()) {
+            log.info("users list is empty");
+            throw new SQLException();
+        }
+        return list;
     }
 
     @LogToken
@@ -72,8 +83,13 @@ public class UserService {
             noRollbackFor = {IllegalStateException.class}
     )
     public List<User> getUserById(@Valid int id) throws SQLException {
-        List<User> user = this.userRepository.getUserById(id);
-        if (user.get(0).getDeletedAt() != null) {
+        List<User> user = new ArrayList<>();
+        try {
+             user = this.userRepository.getUserById(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (!user.isEmpty() && user.get(0).getDeletedAt() != null) {
             log.info("User is archieved so please do not continue.");
             return new ArrayList<User>();
         }
@@ -95,13 +111,16 @@ public class UserService {
             log.info("User is archieved so please do not continue.");
             return new ArrayList<User>();
         }
+        if (user.get(0).getRole().getId() == 1) log.info("trying to access to admin information level");
         return user;
     }
 
 
     @Transactional
     public List<Role> getRoles() throws SQLException {
-        return this.roleRepository.getAll();
+        List<Role> list = this.roleRepository.getAll();
+        if (list.isEmpty()) throw new SQLException();
+        return list;
     }
 
     @Transactional

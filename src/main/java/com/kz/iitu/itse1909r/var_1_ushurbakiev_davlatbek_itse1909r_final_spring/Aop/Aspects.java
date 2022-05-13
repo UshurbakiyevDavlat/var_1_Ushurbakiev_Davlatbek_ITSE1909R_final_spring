@@ -44,4 +44,41 @@ public class Aspects {
         log.info("Checked in the method: " + point.getSignature().getName() + ": We have this list of user data: ");
         log.info(result.toString());
     }
+
+    @AfterReturning(pointcut = "execution(public * com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Service.UserService.getRoles())", returning = "result")
+    public void checkUserRoles(JoinPoint point, Object result) {
+        log.info("Checked in the method: " + point.getSignature().getName() + ": We have this list of roles data: ");
+        log.info(result.toString());
+    }
+
+    @AfterReturning(pointcut = "execution(public * com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Service.UserService.create())", returning = "result")
+    public void checkCreationOfUser(JoinPoint point, Object result) {
+        log.info("Checked in the method: " + point.getSignature().getName() + ": We have this creation of user: ");
+        log.info(result.toString());
+    }
+
+    @AfterReturning(pointcut = "execution(public * com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Service.UserService.delete())", returning = "result")
+    public void checkDeletionOfData(JoinPoint point, Object result) {
+        log.info("Checked in the method: " + point.getSignature().getName() + ": We have this deletion of user data: ");
+        log.info(result.toString());
+    }
+
+    @AfterReturning(pointcut = "execution(public * com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Service.HealthService.getAllHistories())", returning = "result")
+    public void checkHealthHistory(JoinPoint point, Object result) {
+        log.info("Checked in the method: " + point.getSignature().getName() + ": We check histories of health: ");
+        log.info(result.toString());
+    }
+
+    @AfterReturning(pointcut = "execution(public * com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Service.HealthService.getAllLabs())", returning = "result")
+    public void checkLabsHistory(JoinPoint point, Object result) {
+        log.info("Checked in the method: " + point.getSignature().getName() + ": We check histories of labs: ");
+        log.info(result.toString());
+    }
+
+    @AfterReturning(pointcut = "execution(public * com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Service.HealthService.update())", returning = "result")
+    public void checkUpdationOfHealthCard(JoinPoint point, Object result) {
+        log.info("Checked in the method: " + point.getSignature().getName() + ": We update health card: ");
+        log.info(result.toString());
+    }
+
 }
