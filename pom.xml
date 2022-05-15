@@ -81,6 +81,12 @@
             <artifactId>spring-batch-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
         <!--        <dependency>-->
         <!--            <groupId>org.springframework.security</groupId>-->
         <!--            <artifactId>spring-security-test</artifactId>-->
@@ -120,15 +126,21 @@
             <artifactId>spring-jms</artifactId>
         </dependency>
 
-        <dependency>
-            <groupId>javax.jms</groupId>
-            <artifactId>jms</artifactId>
-            <version>1.1</version>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>javax.jms</groupId>-->
+<!--            <artifactId>jms</artifactId>-->
+<!--            <version>1.1</version>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-activemq</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.objectfabric</groupId>
+            <artifactId>objectfabric-cachebuilder</artifactId>
+            <version>0.9.1</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

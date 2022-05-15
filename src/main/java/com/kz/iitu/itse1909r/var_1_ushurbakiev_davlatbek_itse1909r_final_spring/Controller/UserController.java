@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.OPTIONS;
 import javax.ws.rs.core.Response;
 import java.sql.SQLException;
 import java.util.List;
@@ -149,5 +150,13 @@ public class UserController {
         if (userService.delete(id) == Response.Status.NOT_MODIFIED)
             return ResponseEntity.ok("User not deleted");
         return ResponseEntity.ok("User deleted");
+    }
+
+
+    @GetMapping(value = "/logout")
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity logout () {
+        return ResponseEntity.ok("Logout succesfully!");
     }
 }
