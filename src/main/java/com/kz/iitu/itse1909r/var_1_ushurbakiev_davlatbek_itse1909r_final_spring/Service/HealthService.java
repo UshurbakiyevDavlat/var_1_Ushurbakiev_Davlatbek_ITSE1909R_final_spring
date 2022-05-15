@@ -150,6 +150,18 @@ public class HealthService {
     @Modifying
     public Response.Status update(HealthHistory healthHistory, int status) throws SQLException {
         try {
+            if (sessionFactory.isOpen()) {
+                try {
+                    log.info("i have been here");
+                    healthHistory.setStatus(status);
+                    sessionFactory.getCurrentSession().merge(healthHistory);
+                    return  Response.Status.OK;
+                } catch (Exception e) {
+                    log.info(e.getMessage());
+                    log.info("i have been here 2");
+                    return Response.Status.NOT_MODIFIED;
+                }
+            }
             Session session = sessionFactory.openSession();
             session.beginTransaction();
 

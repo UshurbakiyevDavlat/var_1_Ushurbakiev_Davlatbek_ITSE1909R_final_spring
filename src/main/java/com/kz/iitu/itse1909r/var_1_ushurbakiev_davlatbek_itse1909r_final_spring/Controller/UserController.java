@@ -1,5 +1,6 @@
 package com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Controller;
 
+import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Database.Address;
 import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Database.Role;
 import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Database.User;
 import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.JMS.Action;
@@ -106,14 +107,25 @@ public class UserController {
         return roles;
     }
 
+    @GetMapping(value = "/getAddresses")
+    @ResponseStatus(HttpStatus.OK)
+    @Cacheable(value = "addresses")
+    public List<Address> getAddresses() throws SQLException {
+        List<Address> addresses = userService.getAddresses();
+        if (addresses.isEmpty()) throw new IllegalStateException();
+        return addresses;
+    }
+
     @PostMapping(value = "/create")
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity create(@RequestBody User user) throws SQLException {
+    public ResponseEntity create(@RequestBody User user, @RequestParam("address") int address) throws SQLException {
         List<User> listUsers = this.getAll();
+        Address addressInfo = this.userService.getAddressById(address);
+
         int lastId = listUsers.get(listUsers.size() - 1).getId();
-        if (userService.create(user, lastId) == Response.Status.BAD_REQUEST)
-            return (ResponseEntity) ResponseEntity.status(HttpStatus.BAD_REQUEST);
+        if (userService.create(user, lastId,addressInfo) == Response.Status.BAD_REQUEST)
+            return ResponseEntity.ok("Created unsuccesfully");
         return ResponseEntity.ok("Created succesfully");
     }
 
@@ -125,7 +137,7 @@ public class UserController {
             @RequestParam("password") String pass) throws SQLException {
         User user = this.getUserByLogin(login).get(0);
         if (userService.update(user, pass) == Response.Status.NOT_MODIFIED)
-            return (ResponseEntity) ResponseEntity.status(HttpStatus.NOT_MODIFIED);
+            return ResponseEntity.ok("User not changed login|password");
         return ResponseEntity.ok("User changed login|password");
 
     }
@@ -135,7 +147,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity delete(@NotNull @RequestParam("id") Integer id) throws SQLException {
         if (userService.delete(id) == Response.Status.NOT_MODIFIED)
-            return (ResponseEntity) ResponseEntity.status(HttpStatus.NOT_MODIFIED);
+            return ResponseEntity.ok("User not deleted");
         return ResponseEntity.ok("User deleted");
     }
 }

@@ -23,6 +23,18 @@ public class Bill {
     @JoinColumn(name = "bill_detail_id")
     private BillDetail billDetail;
 
+    @Override
+    public String toString() {
+        return "Bill{" +
+                "id=" + id +
+                ", user=" + user +
+                ", billDetail=" + billDetail +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", deletedAt=" + deletedAt +
+                '}';
+    }
+
     @Column(name = "created_at")
     private Instant createdAt;
 

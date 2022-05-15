@@ -94,7 +94,7 @@ public class HealthController {
             @RequestParam("title") String title, @RequestParam("status") int status) throws SQLException {
         HealthHistory healthHistory = this.getConcrete(title).get(0);
         if (healthService.update(healthHistory, status) == Response.Status.NOT_MODIFIED)
-            return (ResponseEntity) ResponseEntity.status(HttpStatus.NOT_MODIFIED);
+            return ResponseEntity.ok("Not found");
         return ResponseEntity.ok("Updated status!");
 
     }

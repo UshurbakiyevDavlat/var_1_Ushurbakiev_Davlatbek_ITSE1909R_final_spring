@@ -1,7 +1,11 @@
 package com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Database;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "roles")
@@ -19,6 +23,32 @@ public class Role {
 
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @JsonIgnore
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "role_id")
+    private List<Permission> permissions = new ArrayList<>();
+
+    @JsonIgnore
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "role_id")
+    private List<User> users = new ArrayList<>();
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(List<User> users) {
+        this.users = users;
+    }
+
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
+    }
 
     public Instant getUpdatedAt() {
         return updatedAt;

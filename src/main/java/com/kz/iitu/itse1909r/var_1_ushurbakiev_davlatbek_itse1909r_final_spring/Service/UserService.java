@@ -1,8 +1,10 @@
 package com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Service;
 
 import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Aop.LogToken;
+import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Database.Address;
 import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Database.Role;
 import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Database.User;
+import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Repository.AddressRepository;
 import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Repository.RoleRepository;
 import com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +13,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.Cache;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.validation.Valid;
@@ -37,6 +37,7 @@ import java.util.List;
 public class UserService {
     public UserRepository userRepository;
     public RoleRepository roleRepository;
+    public final AddressRepository addressRepository;
 
     private final SessionFactory sessionFactory;
 
@@ -45,9 +46,10 @@ public class UserService {
 
     private final CacheManager cacheManager;
 
-    public UserService(SessionFactory sessionFactory, CacheManager cacheManager) {
+    public UserService(SessionFactory sessionFactory, CacheManager cacheManager, AddressRepository addressRepository) {
         this.sessionFactory = sessionFactory;
         this.cacheManager = cacheManager;
+        this.addressRepository = addressRepository;
     }
 
     @Autowired
@@ -85,7 +87,7 @@ public class UserService {
     public List<User> getUserById(@Valid int id) throws SQLException {
         List<User> user = new ArrayList<>();
         try {
-             user = this.userRepository.getUserById(id);
+            user = this.userRepository.getUserById(id);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -124,13 +126,28 @@ public class UserService {
     }
 
     @Transactional
-    public Response.Status create(User user, int last_id) throws SQLException {
+    public List<Address> getAddresses() throws SQLException {
+        List<Address> list = this.addressRepository.getAll();
+        if (list.isEmpty()) throw new SQLException();
+        return list;
+    }
+
+    @Transactional
+    public Address getAddressById(int id) throws SQLException {
+        Address address = this.addressRepository.getById(id);
+        if (address == null) throw new SQLException();
+        return address;
+    }
+
+    @Transactional
+    public Response.Status create(User user, int last_id, Address address) throws SQLException {
         List<Role> roles = this.roleRepository.getAll();
         try {
             Session session = sessionFactory.openSession();
             session.beginTransaction();
             user.setId(last_id + 1);
             user.setCreatedAt(new Date().toInstant());
+            user.setAddress(address);
             user.setRole(roles.get(0));
             session.save(user);
             session.getTransaction().commit();
@@ -145,6 +162,18 @@ public class UserService {
     @Modifying
     public Response.Status update(User user, String newPass) throws SQLException {
         try {
+            if (sessionFactory.isOpen()) {
+                try {
+                    log.info("i have been here");
+                    user.setPassword(newPass);
+                    sessionFactory.getCurrentSession().merge(user);
+                    return  Response.Status.OK;
+                } catch (Exception e) {
+                    log.info(e.getMessage());
+                    log.info("i have been here 2");
+                    return Response.Status.NOT_MODIFIED;
+                }
+            }
             Session session = sessionFactory.openSession();
             session.beginTransaction();
 
@@ -154,6 +183,7 @@ public class UserService {
             session.getTransaction().commit();
             session.close();
         } catch (Exception e) {
+            log.info(e.getMessage());
             return Response.Status.NOT_MODIFIED;
         }
         return Response.Status.OK;

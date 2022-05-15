@@ -1,6 +1,9 @@
 package com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring.Database;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "bill_details")
@@ -19,8 +22,28 @@ public class BillDetail {
     @Column(name = "insurance")
     private Integer insurance;
 
+
     @Column(name = "additional_pay")
     private Integer additionalPay;
+
+    @ManyToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "bills",
+            joinColumns = @JoinColumn(name = "bill_detail_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    Set<User> users;
+
+    @OneToMany(orphanRemoval = true, fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @JoinColumn(name = "bill_detail_id")
+    private List<Bill> bills = new ArrayList<>();
+
+    public List<Bill> getBills() {
+        return bills;
+    }
+
+    public void setBills(List<Bill> bills) {
+        this.bills = bills;
+    }
 
     public Integer getAdditionalPay() {
         return additionalPay;
@@ -54,6 +77,15 @@ public class BillDetail {
         this.labCost = labCost;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+
     @Override
     public String toString() {
         return "BillDetail{" +
@@ -63,14 +95,6 @@ public class BillDetail {
                 ", insurance=" + insurance +
                 ", additionalPay=" + additionalPay +
                 '}';
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     //TODO Reverse Engineering! Migrate other columns to the entity

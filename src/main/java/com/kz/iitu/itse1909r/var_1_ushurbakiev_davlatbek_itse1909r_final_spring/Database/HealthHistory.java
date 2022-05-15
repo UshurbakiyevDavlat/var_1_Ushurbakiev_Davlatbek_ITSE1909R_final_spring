@@ -2,6 +2,8 @@ package com.kz.iitu.itse1909r.var_1_ushurbakiev_davlatbek_itse1909r_final_spring
 
 import javax.persistence.*;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "health_history")
@@ -13,6 +15,10 @@ public class HealthHistory {
 
     @Column(name = "title", length = 100)
     private String title;
+
+    @OneToMany(orphanRemoval = true)
+    @JoinColumn(name = "id")
+    private List<LabReport> labReports = new ArrayList<>();
 
     @Override
     public String toString() {
@@ -47,6 +53,14 @@ public class HealthHistory {
 
     @Column(name = "deleted_at")
     private Instant deletedAt;
+
+    public List<LabReport> getLabReports() {
+        return labReports;
+    }
+
+    public void setLabReports(List<LabReport> labReports) {
+        this.labReports = labReports;
+    }
 
     public Instant getDeletedAt() {
         return deletedAt;
