@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.query.FluentQuery;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import javax.persistence.EntityManager;
 import javax.ws.rs.core.Response;
@@ -515,9 +516,18 @@ class UserServiceTest {
     @InjectMocks
     UserService userService;
 
+    User user;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
+        this.user = new User();
+        ReflectionTestUtils.setField(user, "id", 1);
+        ReflectionTestUtils.setField(user, "password", "passwordTest");
+        ReflectionTestUtils.setField(user, "login", "Test");
+        ReflectionTestUtils.setField(user, "role", new Role());
+        ReflectionTestUtils.setField(user, "age", 22);
+        ReflectionTestUtils.setField(user, "status", 1);
     }
 
     @Test
